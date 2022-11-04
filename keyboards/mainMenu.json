@@ -1,0 +1,54 @@
+{
+  "one_time": false,
+  "inline": true,
+  "buttons": [
+    [
+      {
+      "action": {
+        "type": "text",
+        "label": "Вакансии"},
+      "color": "primary"
+      },
+
+      {
+        "action": {
+          "type": "text",
+          "label": "Стажировки"},
+        "color": "primary"
+      },
+
+      {
+      "action": {
+        "type": "text",
+        "label": "Практики"},
+      "color": "primary"
+      }
+    ],
+
+    [
+      {
+        "action": {
+          "type": "open_link",
+          "link": "https://vk.com/topic-190939167_46757391",
+          "label": "Карьерные советы"}
+      },
+
+      {
+      "action": {
+        "type": "open_link",
+        "link": "https://lift-bf.ru/career",
+        "label": "Профориентация"}
+      }
+    ],
+
+    [
+      {
+        "action": {
+        "type":  "text",
+        "label": "Написать администратору группы"},
+        "color": "default"
+      }
+    ]
+
+  ]
+}

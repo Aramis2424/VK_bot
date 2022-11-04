@@ -1,0 +1,70 @@
+{
+  "one_time": false,
+  "inline": true,
+  "buttons": [
+    [
+      {
+      "action": {
+        "type": "text",
+        "label": "Инженерия"},
+      "color": "primary"
+      },
+
+      {
+        "action": {
+          "type": "text",
+          "label": "IT"},
+        "color": "primary"
+      }
+    ],
+
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Менеджмент"},
+        "color": "primary"
+      },
+
+      {
+      "action": {
+        "type": "text",
+        "label": "Управление"},
+      "color": "primary"
+      }
+    ],
+
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Энергетика"},
+        "color": "primary"
+      },
+
+      {
+      "action": {
+        "type": "text",
+        "label": "Обслуживание"},
+      "color": "primary"
+      }
+    ],
+
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Образование"},
+        "color": "primary"
+      },
+
+      {
+      "action": {
+        "type": "text",
+        "label": "Лингвистика"},
+      "color": "primary"
+      }
+    ]
+
+  ]
+}
