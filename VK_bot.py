@@ -32,8 +32,8 @@ class VKBOT:
     def get_main_menu_msg(self):
         self.NEXT_COMMAND = "any"
         if self.WELCOME_MSG_SEND:
-            self.WELCOME_MSG_SEND = True
             return "Нужно что-нибудь еще?", "mainMenu.json"
+        self.WELCOME_MSG_SEND = True
         return "Что Вас интересует?", "mainMenu.json"
 
     def processing(self, text, user_id):
@@ -65,8 +65,7 @@ class VKBOT:
 
         # Exit
         if text in Commands.exit.value:
-            exit(0)
-            return "Пока"
+            raise TimeoutError
 
         # Unknown command
         menu = self.get_main_menu_msg()

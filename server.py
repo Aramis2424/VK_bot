@@ -1,7 +1,13 @@
-import vk_api
-from vk_bot import VKBOT
-from vk_api.longpoll import VkLongPoll, VkEventType
 from random import randint
+from requests import exceptions
+import os
+import sys
+import datetime
+
+import vk_api
+from vk_api.longpoll import VkLongPoll, VkEventType
+
+from vk_bot import VKBOT
 import config
 
 
@@ -48,8 +54,12 @@ class Server:
                                                       'owner_id': -config.group_id})
         return posts
 
-    def run(self):
-        print("Server started")
+    @staticmethod
+    def print_time():
+        now = datetime.datetime.now()
+        print("Time:", now.strftime("%d-%m-%Y %H:%M"), '\n')
+
+    def listening(self):
         for event in self.longPoll.listen():
             if event.type == VkEventType.MESSAGE_NEW:
                 if event.to_me:
@@ -60,6 +70,7 @@ class Server:
                     if user_id not in self.users:
                         self.users[user_id] = VKBOT()
 
+                    # TODO: Перенести обработчик NEXT_COMMAND в vk_bot;
                     if self.users[user_id].NEXT_COMMAND == 'final':
                         text = self.get_text_msg(
                             self.users[user_id].get_main_menu_msg())
@@ -69,4 +80,24 @@ class Server:
                     text = self.get_text_msg(
                         self.users[user_id].processing(event.text.lower(), event.user_id))
                     self.send_message(event.user_id, text[0], text[1], text[2])
-                    print('Text: ', event.text, '\n')
+                    print('Text: ', event.text)
+                    print("All right")
+                    self.print_time()
+
+    def run(self):
+        print("---------- Server started ----------")
+        self.print_time()
+        try:
+            self.listening()
+        except (exceptions.ConnectionError, TimeoutError, exceptions.Timeout,
+                exceptions.ConnectTimeout, exceptions.ReadTimeout):
+            print("\n---------- Error Timeout ----------")
+            self.print_time()
+            self.restart()
+
+    @staticmethod
+    def restart():
+        print("argv was", sys.argv)
+        print("sys.executable was", sys.executable)
+        print("restart now")
+        os.execv(sys.executable, ['python'] + sys.argv)
