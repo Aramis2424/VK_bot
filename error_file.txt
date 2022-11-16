@@ -1,0 +1,39 @@
+Error: Traceback (most recent call last):
+  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 90, in run
+    self.listening()
+  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 64, in listening
+    for event in self.longPoll.listen():
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\longpoll.py", line 619, in listen
+    for event in self.check():
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\longpoll.py", line 555, in check
+    response = self.session.get(
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 600, in get
+    return self.request("GET", url, **kwargs)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\adapters.py", line 489, in send
+    resp = conn.urlopen(
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 449, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 444, in _make_request
+    httplib_response = conn.getresponse()
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\http\client.py", line 1322, in getresponse
+    response.begin()
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\http\client.py", line 303, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\http\client.py", line 264, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\socket.py", line 669, in readinto
+    return self._sock.recv_into(b)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\ssl.py", line 1241, in recv_into
+    return self.read(nbytes, buffer)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\ssl.py", line 1099, in read
+    return self._sslobj.read(len, buffer)
+KeyboardInterrupt
+
+Time: 16-11-2022 23:05

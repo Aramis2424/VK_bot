@@ -3,6 +3,7 @@ from requests import exceptions
 import os
 import sys
 import datetime
+import traceback
 
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -55,49 +56,53 @@ class Server:
         return posts
 
     @staticmethod
-    def print_time():
+    def get_time():
         now = datetime.datetime.now()
-        print("Time:", now.strftime("%d-%m-%Y %H:%M"), '\n')
+        return "Time: " + str(now.strftime("%d-%m-%Y %H:%M"))
 
     def listening(self):
         for event in self.longPoll.listen():
             if event.type == VkEventType.MESSAGE_NEW:
                 if event.to_me:
-                    print('New message:')
+                    # print('New message:')
                     print('For me by: ', end='')
                     print(event.user_id)
                     user_id = event.user_id
                     if user_id not in self.users:
                         self.users[user_id] = VKBOT()
 
-                    # TODO: Перенести обработчик NEXT_COMMAND в vk_bot;
-                    if self.users[user_id].NEXT_COMMAND == 'final':
-                        text = self.get_text_msg(
-                            self.users[user_id].get_main_menu_msg())
-                        self.send_message(event.user_id, text[0], text[1], text[2])
-                        continue
+                    # # TODO: Перенести обработчик NEXT_COMMAND в vk_bot;
+                    # if self.users[user_id].NEXT_COMMAND == 'final':
+                    #     text = self.get_text_msg(
+                    #         self.users[user_id].get_main_menu_msg())
+                    #     self.send_message(event.user_id, text[0], text[1], text[2])
+                    #     continue
 
                     text = self.get_text_msg(
-                        self.users[user_id].processing(event.text.lower(), event.user_id))
+                        self.users[user_id].processing(event.text, event.user_id))
                     self.send_message(event.user_id, text[0], text[1], text[2])
                     print('Text: ', event.text)
-                    print("All right")
-                    self.print_time()
 
     def run(self):
-        print("---------- Server started ----------")
-        self.print_time()
+        print("========== Server started ==========")
+        print(self.get_time(), "\n")
         try:
             self.listening()
         except (exceptions.ConnectionError, TimeoutError, exceptions.Timeout,
                 exceptions.ConnectTimeout, exceptions.ReadTimeout):
-            print("\n---------- Error Timeout ----------")
-            self.print_time()
+            print("\n!!!------- Error Timeout -------!!!")
+            print(self.get_time(), "\n")
             self.restart()
+        finally:
+            print("\n<><><><><> Unknown error <><><><><>\nFinish.")
+            print(self.get_time(), "\n")
+            file = open("error_file.txt", "w")
+            file.write(f"Error: {traceback.format_exc()}\n{self.get_time()}")
+            file.close()
 
     @staticmethod
     def restart():
-        print("argv was", sys.argv)
-        print("sys.executable was", sys.executable)
-        print("restart now")
+        # print("argv was", sys.argv)
+        # print("sys.executable was", sys.executable)
+        # print("restart now")
         os.execv(sys.executable, ['python'] + sys.argv)
