@@ -29,6 +29,7 @@ class VKBOT:
             return "Что Вас интересует?", "mainMenu.json"
         return "Нужно что-нибудь еще?", "mainMenu.json"
 
+    # TODO: добавить флаг конца диалога по конкретному вопросу (нужно для последовательной отправки сообщений)
     def processing(self, text, user_id):
         if self.next_command == "final":
             answer = self.get_main_menu_msg()
