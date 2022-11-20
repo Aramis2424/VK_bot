@@ -11,7 +11,7 @@ class VKBOT:
 
         # Flag of next command
         self.cur_command = None
-        self.next_command = "start"
+        self.next_command = "any"
 
     def get_welcome_msg(self, user_id):
         """
@@ -23,17 +23,20 @@ class VKBOT:
 
         return "Привет, " + user_name.split()[0] + "!\nЯ бот Центра карьеры МГТУ им. Н.Э. Баумана\n\n"
 
-    def get_main_menu_msg(self, welcome_msg=False):
-        self.next_command = "start"
+    @staticmethod
+    def get_main_menu_msg(welcome_msg=False):
         if welcome_msg:
             return "Что Вас интересует?", "mainMenu.json"
         return "Нужно что-нибудь еще?", "mainMenu.json"
 
     # TODO: добавить флаг конца диалога по конкретному вопросу (нужно для последовательной отправки сообщений)
     def processing(self, text, user_id):
-        if self.next_command == "final":
+        if self.next_command == "menu":
             answer = self.get_main_menu_msg()
-            self.next_command = "start"
+            self.next_command = "any"
+        elif self.next_command == "link_consultCareer":
+            answer = self.choose_command("Профориентация", user_id)
+            self.next_command = "menu"
         else:
             answer = self.choose_command(text, user_id)
         return answer
@@ -58,8 +61,20 @@ class VKBOT:
 
         # Jobs -- вакансии, стажировки, практики
         if text in Commands.jobs.value:
-            self.next_command = "final"
+            self.next_command = "menu"  # TODO: это временно
             return "В какой сфере вы ищете " + str(text) + "?", "jobsSphere.json"
+
+        # Career -- профориентация
+        if text in Commands.career.value:
+            if self.next_command == "any":
+                self.next_command = "link_consultCareer"
+                return "Это профориентационный тест\n" + "https://lift-bf.ru/career"
+            self.next_command = "menu"
+            return "А это карьерная консультация от нашей группы\n" + "https://vk.com/wall-190939167_998"
+
+        if text in Commands.career_tips.value:
+            self.next_command = "menu"
+            return "Тег нашей группы\n" + "https://vk.com/topic-190939167_46757391"
 
         # Help -- помощь
         if text in Commands.help.value:

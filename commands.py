@@ -9,7 +9,10 @@ class Commands(Enum):
     jobs = ["вакансии", "стажировки", "практики"]
 
     """ link to career """
-    career = ["Профориентация"]
+    career = ["профориентация"]
+
+    """ Career tips """
+    career_tips = ["карьерные советы"]
 
     """ greetings """
     greetings = ["привет", "здравствуйте"]

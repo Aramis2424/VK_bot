@@ -8,8 +8,10 @@
         "type": "text",
         "label": "Вакансии"},
       "color": "primary"
-      },
+      }
+    ],
 
+    [
       {
         "action": {
           "type": "text",
@@ -28,27 +30,19 @@
     [
       {
         "action": {
-          "type": "open_link",
-          "link": "https://vk.com/topic-190939167_46757391",
-          "label": "Карьерные советы"}
-      },
-
-      {
-      "action": {
-        "type": "open_link",
-        "link": "https://lift-bf.ru/career",
-        "label": "Профориентация"}
+          "type": "text",
+          "label": "Карьерные советы"},
+      "color": "secondary"
       }
     ],
 
     [
       {
-        "action": {
-        "type":  "text",
-        "label": "Написать администратору группы"},
-        "color": "default"
+      "action": {
+        "type": "text",
+        "label": "Профориентация"},
+      "color": "secondary"
       }
     ]
-
   ]
 }

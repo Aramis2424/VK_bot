@@ -78,10 +78,14 @@ class Server:
                     #     self.send_message(event.user_id, text[0], text[1], text[2])
                     #     continue
 
-                    text = self.get_text_msg(
-                        self.users[user_id].processing(event.text, event.user_id))
-                    self.send_message(event.user_id, text[0], text[1], text[2])
-                    print('Text: ', event.text)
+                    while True:
+                        text = self.get_text_msg(
+                            self.users[user_id].processing(event.text, event.user_id))
+                        self.send_message(event.user_id, text[0], text[1], text[2])
+                        print('Text: ', event.text)
+
+                        if self.users[user_id].next_command == "any":
+                            break
 
     def run(self):
         print("========== Server started ==========")
