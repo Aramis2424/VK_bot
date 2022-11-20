@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 config.py
+error_file.txt
 .idea
 
 # C extensions
