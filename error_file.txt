@@ -1,11 +1,11 @@
 Error: Traceback (most recent call last):
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 166, in run
-    try:
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 139, in listening
-    def listening(self):
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\longpoll.py", line 619, in listen
+  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 154, in run
+    self.listening()
+  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 115, in listening
+    for event in self.longPoll.listen():
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\bot_longpoll.py", line 286, in listen
     for event in self.check():
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\longpoll.py", line 555, in check
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\bot_longpoll.py", line 255, in check
     response = self.session.get(
   File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 600, in get
     return self.request("GET", url, **kwargs)
@@ -36,4 +36,4 @@ Error: Traceback (most recent call last):
     return self._sslobj.read(len, buffer)
 KeyboardInterrupt
 
-Time: 20-11-2022 20:00
+Time: 23-11-2022 01:42

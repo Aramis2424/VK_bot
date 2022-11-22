@@ -7,7 +7,8 @@ from datetime import datetime
 from time import sleep
 
 import vk_api
-from vk_api.longpoll import VkLongPoll, VkEventType
+# from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import json
 
 from vk_bot import VKBOT
@@ -25,7 +26,8 @@ class Server:
         # authorization
         self.vk = vk_api.VkApi(token=config.vk_api_group_token)
         self.person_token = vk_api.VkApi(token=config.vk_api_person_token)
-        self.longPoll = VkLongPoll(self.vk)
+        # self.longPoll = VkLongPoll(self.vk)
+        self.longPoll = VkBotLongPoll(self.vk, self.group_id)
 
         # users dict
         self.users = {}
@@ -81,66 +83,20 @@ class Server:
 
     # TODO: удалить это
     def create_wall_posts_file(self):
-        words_to_del = [
-            "attachments",
-            "post_source",
-            "is_pinned",
-            # "date",
-            "comments",
-            "likes",
-            "reposts",
-            "zoom_text",
-            "hash",
-            "from_id",
-            "owner_id",
-            "marked_as_ads",
-            "can_delete",
-            "is_favorite",
-            "post_type",
-            "can_pin",
-            "postponed_id",
-            "views",
-            "can_edit",
-            "created_by"
-        ]
         data = {}
-
         # for i in range(0, 1700, 100):
         for i in range(1):
             posts = self.get_all_wall_posts(self, i)
             del posts["count"]
             for item in posts["items"]:
-                for word in words_to_del:
-                    if word in item:
-                        del item[word]
-                if "date" in item:
-                    ut = item["date"]
-                    item["date"] = \
-                        datetime.utcfromtimestamp(ut).strftime('%d-%m-%Y')
-
-                post_type = 0
-                if "text" in item:
-                    text = item["text"].split('\n')
-                    # print(text)
-                    if len(text) > 1:
-                        if 'вакансия' in text[0].lower() or \
-                                'вакансия' in text[1].lower():
-                            post_type = 1
-                        elif 'стажировка' in text[0].lower() or \
-                                'стажировка' in text[1].lower():
-                            post_type = 2
-                        elif 'практика' in text[0].lower() or \
-                                'практика' in text[1].lower():
-                            post_type = 3
-
-                item["info"] = post_type
+                self.wall_parser.redact_post(item)
 
             if len(data) == 0:
                 data.update(posts)
             else:
                 data["items"].extend(posts["items"])
 
-        file = open(config.PATH_TO_DATA, "w")
+        file = open(config.PATH_TO_DATA, "w", encoding="utf8")
         str_json = json.dumps(data,
                               indent=2,
                               ensure_ascii=False,
@@ -157,27 +113,40 @@ class Server:
 
     def listening(self):
         for event in self.longPoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW:
-                if event.to_me:
-                    print('For me by: ', end='')
-                    print(event.user_id)
-                    print('Text: ', event.text)
+            if event.type == VkBotEventType.MESSAGE_NEW:
+                # я не знаю как по-другому достать данные =)
+                data_dict = event.obj.values()
+                user_id = -999
+                msg_text = - 998
+                for item in data_dict:
+                    msg_text = item["text"]
+                    user_id = item["from_id"]
+                    break
 
-                    user_id = event.user_id
-                    if user_id not in self.users:
-                        self.users[user_id] = VKBOT()
+                print('For me by: ', end='')
+                print(user_id)
+                print('Text: ', msg_text)
 
-                    while True:
-                        text = self.get_text_msg(
-                            self.users[user_id].processing(event.text, event.user_id))
-                        self.send_message(event.user_id, text[0], text[1], text[2])
+                if user_id not in self.users:
+                    self.users[user_id] = VKBOT()
 
-                        if self.users[user_id].next_command == "any":
-                            break
-                        if self.users[user_id].next_command == "/admin2022load":
-                            self.users[user_id].next_command = 'any'
-                            self.create_wall_posts_file()
-                            break
+                while True:
+                    text = self.get_text_msg(
+                        self.users[user_id].processing(msg_text, user_id))
+                    self.send_message(user_id, text[0], text[1], text[2])
+
+                    if self.users[user_id].next_command == "any":
+                        break
+                    if self.users[user_id].next_command == "/admin2022load":
+                        self.users[user_id].next_command = 'any'
+                        self.create_wall_posts_file()
+                        break
+            elif event.type == VkBotEventType.WALL_POST_NEW:
+                print("New post")
+                self.update_file(event.obj)
+                self.update_vac()
+                self.update_inter()
+                self.update_prac()
 
     def run(self):
         print("========== Server started ==========")
@@ -211,3 +180,18 @@ class Server:
 
     def update_prac(self):
         Jobs.practices = self.wall_parser.select_posts(3)
+
+    def update_file(self, new_post):
+        new_post = self.wall_parser.redact_post(new_post)
+        with open(config.PATH_TO_DATA, "r", encoding="utf8") as file:
+            posts = json.load(file)
+            # posts["items"].append(new_post)
+            posts["items"] = [new_post] + posts["items"]
+
+        with open(config.PATH_TO_DATA, "w", encoding="utf8") as file:
+            str_json = json.dumps(posts,
+                                  indent=2,
+                                  ensure_ascii=False,
+                                  separators=(',', ': ')
+                                  )
+            file.write(str_json)
