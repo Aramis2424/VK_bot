@@ -2,6 +2,7 @@ import config
 from bot_parser import str_parser
 from commands import Commands
 from bot_parser import wallPosts_parser
+from jobs import Jobs
 
 
 class VKBOT:
@@ -14,7 +15,7 @@ class VKBOT:
 
         # Flags
         self.post_index = 0
-        self.posts = []
+        # self.posts = []
         self.type_post = 0
         self.yn_continue = 0
         self.next_command = "any"
@@ -32,7 +33,6 @@ class VKBOT:
     def get_main_menu_msg(self, welcome_msg=False):
         # Сброс флагов и переменных
         self.next_command = "any"
-        self.posts = []
         self.type_post = 0
         self.post_index = 0
         if welcome_msg:
@@ -52,7 +52,7 @@ class VKBOT:
             self.next_command = "any"
         elif self.next_command == "any" and self.yn_continue:
             self.yn_continue = 0
-            if text == "нет":  # TODO вот здесь ошибка, надо остальные переменные сбросить
+            if text == "нет":
                 answer = self.get_main_menu_msg()
             else:
                 answer = self.output_jobs()
@@ -61,12 +61,19 @@ class VKBOT:
         return answer
 
     def output_jobs(self):
-        if self.post_index < len(self.posts):
+        if self.type_post == 1:
+            posts = Jobs.vacancies
+        elif self.type_post == 2:
+            posts = Jobs.internships
+        else:
+            posts = Jobs.practices
+
+        if self.post_index < len(posts):
             self.yn_continue = 1
             self.next_command = "output_jobs"
             self.post_index += 1
             index = self.post_index - 1
-            return "wall" + str(-config.group_id) + "_" + str(self.posts[index]["id"])
+            return "wall" + str(-config.group_id) + "_" + str(posts[index]["id"])
         else:
             menu = self.get_main_menu_msg()
             return "К сожалению, это всё\n\n" + menu[0], menu[1]
@@ -94,9 +101,10 @@ class VKBOT:
             # self.next_command = "menu"  # TODO: это временно
             # return "В какой сфере вы ищете " + str(text) + "?", "jobsSphere.json"
 
-            if len(self.posts) == 0:  # т.е если в первый раз
-                self.type_post = self.str_parser.select_post_type(text)
-                self.posts = self.wall_parser.select_posts(self.type_post)
+            # if len(self.posts) == 0:  # т.е если в первый раз
+            #     self.type_post = self.str_parser.select_post_type(text)
+            #     self.posts = self.wall_parser.select_posts(self.type_post)
+            self.type_post = self.str_parser.select_post_type(text)
             return self.output_jobs()
 
         # Career -- профориентация

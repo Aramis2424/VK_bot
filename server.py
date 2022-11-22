@@ -11,6 +11,8 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 import json
 
 from vk_bot import VKBOT
+from bot_parser import wallPosts_parser
+from jobs import Jobs
 import config
 
 
@@ -27,6 +29,14 @@ class Server:
 
         # users dict
         self.users = {}
+
+        self.wall_parser = wallPosts_parser.WallPostsParser()
+
+        # TODO: эти же функции нужно запускать при событии новый пост
+        # Начальная установка массивов
+        self.update_vac()
+        self.update_inter()
+        self.update_prac()
 
     def send_message(self, user_id, message, attachment, name_keyboard):
         for i in range(3):
@@ -192,3 +202,12 @@ class Server:
         # print("sys.executable was", sys.executable)
         # print("restart now")
         os.execv(sys.executable, ['python'] + sys.argv)
+
+    def update_vac(self):
+        Jobs.vacancies = self.wall_parser.select_posts(1)
+
+    def update_inter(self):
+        Jobs.internships = self.wall_parser.select_posts(2)
+
+    def update_prac(self):
+        Jobs.practices = self.wall_parser.select_posts(3)
