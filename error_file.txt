@@ -1,22 +1,14 @@
 Error: Traceback (most recent call last):
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 94, in run
-    self.listening()
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 83, in listening
-    self.users[user_id].processing(event.text, event.user_id))
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\vk_bot.py", line 41, in processing
-    answer = self.choose_command(text, user_id)
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\vk_bot.py", line 55, in choose_command
-    return self.get_welcome_msg(user_id) + menu[0], menu[1]
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\vk_bot.py", line 22, in get_welcome_msg
-    user_name = self.str_parser.get_user_name_from_vk_id(user_id)
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\bot_parser\str_parser.py", line 13, in get_user_name_from_vk_id
-    b = self.set_http("https://vk.com/id" + str(user_id))
-  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\bot_parser\str_parser.py", line 21, in set_http
-    request = requests.get(http)
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\api.py", line 73, in get
-    return request("get", url, params=params, **kwargs)
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\api.py", line 59, in request
-    return session.request(method=method, url=url, **kwargs)
+  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 166, in run
+    try:
+  File "C:\Users\kovro\Desktop\VK_bot\VK_bot\server.py", line 139, in listening
+    def listening(self):
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\longpoll.py", line 619, in listen
+    for event in self.check():
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\vk_api\longpoll.py", line 555, in check
+    response = self.session.get(
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 600, in get
+    return self.request("GET", url, **kwargs)
   File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 587, in request
     resp = self.send(prep, **send_kwargs)
   File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 701, in send
@@ -25,16 +17,23 @@ Error: Traceback (most recent call last):
     resp = conn.urlopen(
   File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen
     httplib_response = self._make_request(
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 386, in _make_request
-    self._validate_conn(conn)
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 1042, in _validate_conn
-    conn.connect()
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connection.py", line 358, in connect
-    self.sock = conn = self._new_conn()
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connection.py", line 174, in _new_conn
-    conn = connection.create_connection(
-  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
-    sock.connect(sa)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 449, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 444, in _make_request
+    httplib_response = conn.getresponse()
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\http\client.py", line 1322, in getresponse
+    response.begin()
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\http\client.py", line 303, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\http\client.py", line 264, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\socket.py", line 669, in readinto
+    return self._sock.recv_into(b)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\ssl.py", line 1241, in recv_into
+    return self.read(nbytes, buffer)
+  File "C:\Users\kovro\AppData\Local\Programs\Python\Python38\lib\ssl.py", line 1099, in read
+    return self._sslobj.read(len, buffer)
 KeyboardInterrupt
 
-Time: 20-11-2022 12:41
+Time: 20-11-2022 20:00

@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+data/
 config.py
 error_file.txt
 .idea

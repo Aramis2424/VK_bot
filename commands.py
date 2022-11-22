@@ -20,8 +20,8 @@ class Commands(Enum):
     """ help """
     help = ["помощь", "меню", "команды", "справка", "кнопки"]
 
-    """ send message to administrator """
-    admin = ["Написать администратору группы"]
+    """ administrator """
+    admin = ["/admin2022load"]
 
     """ exit """
     exit = ["пока 2020"]

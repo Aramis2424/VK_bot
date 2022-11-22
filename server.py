@@ -2,11 +2,13 @@ from random import randint
 from requests import exceptions
 import os
 import sys
-import datetime
 import traceback
+from datetime import datetime
+from time import sleep
 
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
+import json
 
 from vk_bot import VKBOT
 import config
@@ -27,12 +29,20 @@ class Server:
         self.users = {}
 
     def send_message(self, user_id, message, attachment, name_keyboard):
-        self.vk.method('messages.send', {'peer_id': user_id,
-                                         'message': message,
-                                         'random_id': randint(-1024, 1024),
-                                         'attachment': attachment,
-                                         'keyboard': open("keyboards/" + name_keyboard, "r",
-                                                          encoding="UTF-8").read()})
+        for i in range(3):
+            try:
+                self.vk.method('messages.send', {'user_id': user_id,
+                                                 'message': message,
+                                                 'random_id': randint(-1024, 1024),
+                                                 'attachment': attachment,
+                                                 'keyboard': open("keyboards/" + name_keyboard, "r",
+                                                                  encoding="UTF-8").read()})
+            except:  # TODO посмотреть какие бывают ошибки
+                sleep(0.5)
+                continue
+            else:
+                sleep(0.2)  # Нужно чтобы бот корректно отправлял несколько сообщений подряд
+                break
 
     @staticmethod
     def get_text_msg(answer):
@@ -47,44 +57,116 @@ class Server:
             if '.json' in answer[1]:
                 return answer[0], 0, answer[1]
             return answer[0], answer[1], 'none.json'
+        elif "wall" in answer:  # just wall post, without text
+            if "карьерная консультация" not in answer:
+                return '', answer, 'none.json'
         return answer, 0, 'none.json'
 
     @staticmethod
-    def get_all_wall_posts(self):
+    def get_all_wall_posts(self, offset=0):
         posts = self.person_token.method('wall.get', {'count': config.MAX_COUNT_POSTS,
-                                                      'owner_id': -config.group_id})
+                                                      'owner_id': -config.group_id,
+                                                      'offset': offset})
         return posts
+
+    # TODO: удалить это
+    def create_wall_posts_file(self):
+        words_to_del = [
+            "attachments",
+            "post_source",
+            "is_pinned",
+            # "date",
+            "comments",
+            "likes",
+            "reposts",
+            "zoom_text",
+            "hash",
+            "from_id",
+            "owner_id",
+            "marked_as_ads",
+            "can_delete",
+            "is_favorite",
+            "post_type",
+            "can_pin",
+            "postponed_id",
+            "views",
+            "can_edit",
+            "created_by"
+        ]
+        data = {}
+
+        # for i in range(0, 1700, 100):
+        for i in range(1):
+            posts = self.get_all_wall_posts(self, i)
+            del posts["count"]
+            for item in posts["items"]:
+                for word in words_to_del:
+                    if word in item:
+                        del item[word]
+                if "date" in item:
+                    ut = item["date"]
+                    item["date"] = \
+                        datetime.utcfromtimestamp(ut).strftime('%d-%m-%Y')
+
+                post_type = 0
+                if "text" in item:
+                    text = item["text"].split('\n')
+                    # print(text)
+                    if len(text) > 1:
+                        if 'вакансия' in text[0].lower() or \
+                                'вакансия' in text[1].lower():
+                            post_type = 1
+                        elif 'стажировка' in text[0].lower() or \
+                                'стажировка' in text[1].lower():
+                            post_type = 2
+                        elif 'практика' in text[0].lower() or \
+                                'практика' in text[1].lower():
+                            post_type = 3
+
+                item["info"] = post_type
+
+            if len(data) == 0:
+                data.update(posts)
+            else:
+                data["items"].extend(posts["items"])
+
+        file = open(config.PATH_TO_DATA, "w")
+        str_json = json.dumps(data,
+                              indent=2,
+                              ensure_ascii=False,
+                              separators=(',', ': ')
+                              )
+        file.write(str_json)
+        file.close()
+        print('here')
 
     @staticmethod
     def get_time():
-        now = datetime.datetime.now()
+        now = datetime.now()
         return "Time: " + str(now.strftime("%d-%m-%Y %H:%M"))
 
     def listening(self):
         for event in self.longPoll.listen():
             if event.type == VkEventType.MESSAGE_NEW:
                 if event.to_me:
-                    # print('New message:')
                     print('For me by: ', end='')
                     print(event.user_id)
+                    print('Text: ', event.text)
+
                     user_id = event.user_id
                     if user_id not in self.users:
                         self.users[user_id] = VKBOT()
-
-                    # # TODO: Перенести обработчик NEXT_COMMAND в vk_bot;
-                    # if self.users[user_id].NEXT_COMMAND == 'final':
-                    #     text = self.get_text_msg(
-                    #         self.users[user_id].get_main_menu_msg())
-                    #     self.send_message(event.user_id, text[0], text[1], text[2])
-                    #     continue
 
                     while True:
                         text = self.get_text_msg(
                             self.users[user_id].processing(event.text, event.user_id))
                         self.send_message(event.user_id, text[0], text[1], text[2])
-                        print('Text: ', event.text)
 
                         if self.users[user_id].next_command == "any":
+                            break
+                        if self.users[user_id].next_command == "/admin2022load":
+                            self.users[user_id].next_command = 'any'
+                            self.create_wall_posts_file()
                             break
 
     def run(self):

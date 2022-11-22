@@ -17,6 +17,15 @@ class Parser:
         return user_name
 
     @staticmethod
+    def select_post_type(post_job):
+        if post_job == "вакансии":
+            return 1
+        elif post_job == "стажировки":
+            return 2
+        elif post_job == "практики":
+            return 3
+
+    @staticmethod
     def set_http(http: str):
         request = requests.get(http)
         bs = bs4.BeautifulSoup(request.text, "html.parser")

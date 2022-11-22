@@ -1,5 +1,7 @@
+import config
 from bot_parser import str_parser
 from commands import Commands
+from bot_parser import wallPosts_parser
 
 
 class VKBOT:
@@ -8,9 +10,13 @@ class VKBOT:
 
         # Parsing tools
         self.str_parser = str_parser.Parser()
+        self.wall_parser = wallPosts_parser.WallPostsParser()
 
-        # Flag of next command
-        self.cur_command = None
+        # Flags
+        self.post_index = 0
+        self.posts = []
+        self.type_post = 0
+        self.yn_continue = 0
         self.next_command = "any"
 
     def get_welcome_msg(self, user_id):
@@ -23,23 +29,47 @@ class VKBOT:
 
         return "Привет, " + user_name.split()[0] + "!\nЯ бот Центра карьеры МГТУ им. Н.Э. Баумана\n\n"
 
-    @staticmethod
-    def get_main_menu_msg(welcome_msg=False):
+    def get_main_menu_msg(self, welcome_msg=False):
+        # Сброс флагов и переменных
+        self.next_command = "any"
+        self.posts = []
+        self.type_post = 0
+        self.post_index = 0
         if welcome_msg:
             return "Что Вас интересует?", "mainMenu.json"
         return "Нужно что-нибудь еще?", "mainMenu.json"
 
-    # TODO: добавить флаг конца диалога по конкретному вопросу (нужно для последовательной отправки сообщений)
     def processing(self, text, user_id):
+        text = text.lower()
         if self.next_command == "menu":
             answer = self.get_main_menu_msg()
             self.next_command = "any"
         elif self.next_command == "link_consultCareer":
             answer = self.choose_command("Профориентация", user_id)
             self.next_command = "menu"
+        elif self.next_command == "output_jobs":
+            answer = ("Показать еще?", "YN_continue.json")
+            self.next_command = "any"
+        elif self.next_command == "any" and self.yn_continue:
+            self.yn_continue = 0
+            if text == "нет":  # TODO вот здесь ошибка, надо остальные переменные сбросить
+                answer = self.get_main_menu_msg()
+            else:
+                answer = self.output_jobs()
         else:
             answer = self.choose_command(text, user_id)
         return answer
+
+    def output_jobs(self):
+        if self.post_index < len(self.posts):
+            self.yn_continue = 1
+            self.next_command = "output_jobs"
+            self.post_index += 1
+            index = self.post_index - 1
+            return "wall" + str(-config.group_id) + "_" + str(self.posts[index]["id"])
+        else:
+            menu = self.get_main_menu_msg()
+            return "К сожалению, это всё\n\n" + menu[0], menu[1]
 
     def choose_command(self, text, user_id):
         """
@@ -61,8 +91,13 @@ class VKBOT:
 
         # Jobs -- вакансии, стажировки, практики
         if text in Commands.jobs.value:
-            self.next_command = "menu"  # TODO: это временно
-            return "В какой сфере вы ищете " + str(text) + "?", "jobsSphere.json"
+            # self.next_command = "menu"  # TODO: это временно
+            # return "В какой сфере вы ищете " + str(text) + "?", "jobsSphere.json"
+
+            if len(self.posts) == 0:  # т.е если в первый раз
+                self.type_post = self.str_parser.select_post_type(text)
+                self.posts = self.wall_parser.select_posts(self.type_post)
+            return self.output_jobs()
 
         # Career -- профориентация
         if text in Commands.career.value:
@@ -74,7 +109,7 @@ class VKBOT:
 
         if text in Commands.career_tips.value:
             self.next_command = "menu"
-            return "Тег нашей группы\n" + "https://vk.com/topic-190939167_46757391"
+            return "Вот тег нашей группы\n" + "https://vk.com/topic-190939167_46757391"
 
         # Help -- помощь
         if text in Commands.help.value:
@@ -83,6 +118,11 @@ class VKBOT:
         # Exit -- пока 2020
         if text in Commands.exit.value:
             raise TimeoutError
+
+        # Admin
+        if text in Commands.admin.value:
+            self.next_command = "/admin2022load"
+            return "/Complete"
 
         # Unknown command
         menu = self.get_main_menu_msg(welcome_msg=True)
