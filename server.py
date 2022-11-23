@@ -109,6 +109,9 @@ class Server:
         return "Time: " + str(now.strftime("%d-%m-%Y %H:%M"))
 
     def listening(self):
+        vip_users = []
+        if len(sys.argv) > 1 and sys.argv[1] == "test":
+            vip_users = [467289684, 392239205, 233248602]
         for event in self.longPoll.listen():
             if event.type == VkBotEventType.MESSAGE_NEW:
                 # я не знаю как по-другому достать данные =)
@@ -119,6 +122,8 @@ class Server:
                     msg_text = item["text"]
                     user_id = item["from_id"]
                     break
+                if vip_users and user_id not in vip_users:
+                    continue
 
                 # print('For me by: ', end='')
                 # print(user_id)
