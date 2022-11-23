@@ -39,7 +39,7 @@ class VKBOT:
             return "Что Вас интересует?", "mainMenu.json"
         return "Нужно что-нибудь еще?", "mainMenu.json"
 
-    def processing(self, text, user_id):
+    def processing(self, text, user_id):  # Функция обработки текущего флага
         text = text.lower()
         if self.next_command == "menu":
             answer = self.get_main_menu_msg()
@@ -101,9 +101,6 @@ class VKBOT:
             # self.next_command = "menu"  # TODO: это временно
             # return "В какой сфере вы ищете " + str(text) + "?", "jobsSphere.json"
 
-            # if len(self.posts) == 0:  # т.е если в первый раз
-            #     self.type_post = self.str_parser.select_post_type(text)
-            #     self.posts = self.wall_parser.select_posts(self.type_post)
             self.type_post = self.str_parser.select_post_type(text)
             return self.output_jobs()
 

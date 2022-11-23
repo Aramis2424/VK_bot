@@ -7,7 +7,6 @@ from datetime import datetime
 from time import sleep
 
 import vk_api
-# from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import json
 
@@ -32,16 +31,16 @@ class Server:
         # users dict
         self.users = {}
 
+        # Обработчик записей на стене
         self.wall_parser = wallPosts_parser.WallPostsParser()
 
-        # TODO: эти же функции нужно запускать при событии новый пост
-        # Начальная установка массивов
+        # Начальная установка массивов записей
         self.update_vac()
         self.update_inter()
         self.update_prac()
 
     def send_message(self, user_id, message, attachment, name_keyboard):
-        for i in range(3):
+        for i in range(3):  # Трижды пытается отправить сообщение если будет ошибка
             try:
                 self.vk.method('messages.send', {'user_id': user_id,
                                                  'message': message,
@@ -49,7 +48,7 @@ class Server:
                                                  'attachment': attachment,
                                                  'keyboard': open("keyboards/" + name_keyboard, "r",
                                                                   encoding="UTF-8").read()})
-            except:  # TODO посмотреть какие бывают ошибки
+            except vk_api.exceptions:
                 sleep(0.5)
                 continue
             else:
@@ -81,11 +80,10 @@ class Server:
                                                       'offset': offset})
         return posts
 
-    # TODO: удалить это
     def create_wall_posts_file(self):
         data = {}
-        # for i in range(0, 1700, 100):
-        for i in range(1):
+        # for i in range(1):
+        for i in range(0, 2000, 100):
             posts = self.get_all_wall_posts(self, i)
             del posts["count"]
             for item in posts["items"]:
@@ -104,8 +102,8 @@ class Server:
                               )
         file.write(str_json)
         file.close()
-        print('here')
 
+    # TODO: Вынести в другой файл
     @staticmethod
     def get_time():
         now = datetime.now()
@@ -123,9 +121,9 @@ class Server:
                     user_id = item["from_id"]
                     break
 
-                print('For me by: ', end='')
-                print(user_id)
-                print('Text: ', msg_text)
+                # print('For me by: ', end='')
+                # print(user_id)
+                # print('Text: ', msg_text)
 
                 if user_id not in self.users:
                     self.users[user_id] = VKBOT()
