@@ -110,7 +110,7 @@ class Server:
 
     def listening(self):
         vip_users = []
-        if len(sys.argv) > 1 and sys.argv[1] == "test":
+        if len(sys.argv) > 1 and sys.argv[1] == "test":  # Тестовый режим
             vip_users = [467289684, 392239205, 233248602]
         for event in self.longPoll.listen():
             if event.type == VkBotEventType.MESSAGE_NEW:
@@ -122,7 +122,7 @@ class Server:
                     msg_text = item["text"]
                     user_id = item["from_id"]
                     break
-                if vip_users and user_id not in vip_users:
+                if vip_users and user_id not in vip_users:  # Тестовый режим
                     continue
 
                 # print('For me by: ', end='')
