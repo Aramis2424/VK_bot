@@ -103,7 +103,6 @@ class Server:
         file.write(str_json)
         file.close()
 
-    # TODO: Вынести в другой файл
     @staticmethod
     def get_time():
         now = datetime.now()
